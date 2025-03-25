@@ -2,15 +2,14 @@
 
 import { defaultLocale, Locale } from "@/services/domain";
 import { cookies } from "next/headers";
-
-const COOKIE_NAME = "NEXT_LOCALE";
-
+import { Cookies } from "@/services/cookies";
 export async function getUserLocale() {
-  return ((await cookies()).get(COOKIE_NAME)?.value || defaultLocale) as Locale;
+  return ((await cookies()).get(Cookies.locale)?.value ||
+    defaultLocale) as Locale;
 }
 
 export async function setUserLocale(locale: Locale) {
-  (await cookies()).set(COOKIE_NAME, locale);
+  (await cookies()).set(Cookies.locale, locale);
 }
 
 export const getMessages = async (locale: Locale) => {
@@ -24,4 +23,8 @@ export const getMessages = async (locale: Locale) => {
 const ptMessages = {
   hello: "Olá",
   world: "Mundo",
+  login: "Login na lista de compras",
+  email: "Email",
+  password: "Senha",
+  loginButton: "Entrar",
 };
