@@ -27,4 +27,5 @@ const ptMessages = {
   email: "Email",
   password: "Senha",
   loginButton: "Entrar",
+  workspaces: "Espaços de trabalho",
 };

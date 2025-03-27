@@ -10,6 +10,7 @@ import { api } from "@/services/server";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { setUserToken } from "@/services/auth";
+import { useMutation } from "@tanstack/react-query";
 
 export default function Login() {
   const router = useRouter();
@@ -19,20 +20,25 @@ export default function Login() {
     defaultValues,
   });
 
-  const onSubmit = async (data: LoginForm) => {
-    try {
-      const response = await api.post("/users/login", data);
-
-      api.defaults.headers.common.Authorization = `Bearer ${response.data.token}`;
-      setUserToken(response.data.token);
-
-      toast.success(
+  const { mutate: login, isPending } = useMutation({
+    mutationFn: (data: LoginForm) => api.post("/users/login", data),
+    onSuccess: (data) => {
+      setUserToken(data.data.token);
+      router.push("/workspaces");
+    },
+    onError: () => {
+      toast.error(
         intl.formatMessage({
-          id: "loginSuccess",
-          defaultMessage: "Login successfully",
+          id: "loginError",
+          defaultMessage: "Error logging in",
         }),
       );
-      router.push("/workspaces");
+    },
+  });
+
+  const onSubmit = async (data: LoginForm) => {
+    try {
+      login(data);
     } catch {
       toast.error(
         intl.formatMessage({
@@ -52,6 +58,7 @@ export default function Login() {
             id: "email",
             defaultMessage: "Email",
           })}
+          disabled={isPending}
           {...form.register("email")}
         />
         <Input
@@ -60,9 +67,10 @@ export default function Login() {
             id: "password",
             defaultMessage: "Password",
           })}
+          disabled={isPending}
           {...form.register("password")}
         />
-        <Button type="submit">
+        <Button type="submit" disabled={isPending}>
           <FormattedMessage id="loginButton" defaultMessage="Login" />
         </Button>
       </div>
